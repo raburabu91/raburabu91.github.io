@@ -20,20 +20,18 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":20},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="This is the reading memo of the Fairseq framework.">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Fairseq-Reading-Memo(1)">
-<meta property="og:url" content="http://example.com/2021/09/03/Fairseq-Reading-Memo(1)/index.html">
+  <meta property="og:type" content="article">
+<meta property="og:title" content="Fairseq-Reading-Memo(2)">
+<meta property="og:url" content="http://example.com/2021/09/03/Fairseq-Reading-Memo-2/index.html">
 <meta property="og:site_name" content="Raburabu">
-<meta property="og:description" content="This is the reading memo of the Fairseq framework.">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-09-03T01:24:29.000Z">
-<meta property="article:modified_time" content="2021-09-03T07:35:31.910Z">
+<meta property="article:published_time" content="2021-09-03T07:37:07.000Z">
+<meta property="article:modified_time" content="2021-09-03T07:37:31.739Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2021/09/03/Fairseq-Reading-Memo(1)/">
+<link rel="canonical" href="http://example.com/2021/09/03/Fairseq-Reading-Memo-2/">
 
 
 <script id="page-configurations">
@@ -46,7 +44,7 @@
   };
 </script>
 
-  <title>Fairseq-Reading-Memo(1) | Raburabu</title>
+  <title>Fairseq-Reading-Memo(2) | Raburabu</title>
   
 
 
@@ -171,7 +169,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/09/03/Fairseq-Reading-Memo(1)/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/09/03/Fairseq-Reading-Memo-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -184,7 +182,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Fairseq-Reading-Memo(1)
+          Fairseq-Reading-Memo(2)
         </h1>
 
         <div class="post-meta">
@@ -195,7 +193,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 09:24:29 / Modified: 15:35:31" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 15:37:07 / Modified: 15:37:31" itemprop="dateCreated datePublished" datetime="2021-09-03T15:37:07+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -218,72 +216,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>This is the reading memo of the Fairseq framework. </p>
-<span id="more"></span>
-
-<h2 id="训练流程"><a href="#训练流程" class="headerlink" title="训练流程"></a>训练流程</h2><ol>
-<li>fairseq-master最外层的train.py文件调用主函数fairseq_cli.train中的cli_main()启动训练过程。</li>
-<li>在cli_main()函数中主要完成参数的读取、分布式训练和单GPU训练的初始化（分布式训练，单节点多GPU，单GPU）。单GPU条件下直接调用main()函数；分布式训练则首先调用distributed_main()函数完成分布式设置，而后再调用main()函数。</li>
-<li>在main()函数中的流程如下：<ul>
-<li>判断是否使用CUDA或分布式</li>
-<li>打印全部参数</li>
-<li>创建并初始化task: tasks.setup_task()</li>
-<li>加载验证集</li>
-<li>建立模型model和损失函数criterion: task.build_model(); task.build_criterion()。这两部分都是在对应的task中完成的。</li>
-<li>创建训练器Trainer</li>
-<li>检查是否有checkpoint文件，如果有就加载，无重新开始训练</li>
-<li>创建训练控制器</li>
-<li>开始训练，直到训练结束（训练过程由学习率lr，最大轮数max_epoch和最大更新步数max_update共同控制）<ul>
-<li>训练一个epoch</li>
-<li>如果验证集存在，进行一次验证并得到损失</li>
-<li>利用第一个验证集损失更新学习率lr</li>
-<li>保存模型（checkpoint）</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="任务创建（task-setup-task）"><a href="#任务创建（task-setup-task）" class="headerlink" title="任务创建（task.setup_task）"></a>任务创建（task.setup_task）</h2><ol>
-<li><p>调用fairseq/models文件夹下的__init__.py文件，由__init__.setup_task()函数来调用对应训练任务的setup_task()函数，并有setup_task()函数完成对task的初始化。</p>
-</li>
-<li><p>以TranslationMultiSimpleEpochTask为例，在__init__()函数中完成对语言langs，词表dicts，语言对lang_pairs，源语言source_langs，目标语言target_langs，数据过采样方法sampling_method，数据读取工具data_amnager的初始化，检查是否有不在词典中的语言。</p>
-</li>
-</ol>
-<h2 id="创建模型（task-build-model）"><a href="#创建模型（task-build-model）" class="headerlink" title="创建模型（task.build_model）"></a>创建模型（task.build_model）</h2><ol>
-<li><p>task调用父类LegacyFairseqTask中的build_model()函数创建模型。</p>
-</li>
-<li><p>build_model()函数通过调用fairseq/models文件夹中__init__.py中的build_model()函数创建模型。判断模型是否是定义过的，而后返回model.build_model()函数。</p>
-</li>
-<li><p>以Transformer model为例，首先设置源语言和目标语言两端的词表，并根据共享参数设置初始化编码器和解码器的词嵌入（build_embedding）。而后调用build_encoder()和build_decoder()函数初始化编码器和解码器（build_embedding()、build_encoder()和build_decoder()函数都定义在父类TransformerModelBase类中）。最后调用__init__()函数初始化TransformerModel类。</p>
-<ul>
-<li>注：新版本的transformer模型从fairseq/models文件夹中移动到了fairseq/models/transformer文件夹中，分为transformer_base.py，transformer_encoder.py，transformer_decoder.py，transformer_legacy.py和transformer_config.py文件。其中，TransformerModelBase定义在transformer_base.py，TransformerModel定义在transformer_legacy.py中。</li>
-</ul>
-</li>
-</ol>
-<h2 id="创建损失函数（task-build-criterion）"><a href="#创建损失函数（task-build-criterion）" class="headerlink" title="创建损失函数（task.build_criterion）"></a>创建损失函数（task.build_criterion）</h2><p>build_criterion()函数定义在TranslationMultiSimpleEpochTask的父类LegacyFairseqTask类中，最后调用fairseq/critrions文件夹__init__.py中的build_criterion()函数，继而调用build_criterion_()函数，由fairseq/registry.py文件中setup_registry()函数返回对应的损失函数（如：label_smoothed_cross_entropy）。</p>
-<h2 id="读取验证集"><a href="#读取验证集" class="headerlink" title="读取验证集"></a>读取验证集</h2><p>调用task.load_dataset()函数读取验证集数据。</p>
-<h2 id="创建训练器（Trainer）"><a href="#创建训练器（Trainer）" class="headerlink" title="创建训练器（Trainer）"></a>创建训练器（Trainer）</h2><p>若model_parallel_size为1，调用Trainer()函数创建训练器；否则调用MegatronTrainer()函数创建训练器。训练器参数包括task，model，criterion和quantizer（可选）。</p>
-<h2 id="读取checkpoint"><a href="#读取checkpoint" class="headerlink" title="读取checkpoint"></a>读取checkpoint</h2><ol>
-<li><p>利用fairseq/checkpoint_utils.py中的load_checkpoint()读取checkpoint，得到训练迭代轮数epoch_itr。</p>
-</li>
-<li><p>利用trainer.get_lr()函数获取当前的学习率lr。</p>
-</li>
-<li><p>创建训练控制器train_meter。</p>
-</li>
-</ol>
-<h2 id="开始训练"><a href="#开始训练" class="headerlink" title="开始训练"></a>开始训练</h2><ol>
-<li><p>训练过程由最大训练轮数max_epoch，最小学习率stop_min_lr控制，当轮数大于max_epoch或学习率小于stop_min_lr时，结束训练。</p>
-</li>
-<li><p>通过train()函数训练一个epoch，得到验证集损失valid_losses和训练结束判定should_stop。如果should_stop为真，break结束训练。</p>
-</li>
-<li><p>利用epoch和valid_loss通过trainer.lr_step()函数更新学习率lr。</p>
-</li>
-<li><p>更新epoch_itr。</p>
-</li>
-<li><p>结束训练，关闭训练控制器train_meter。</p>
-</li>
-</ol>
-
+        
     </div>
 
     
@@ -301,8 +234,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/09/01/Multilingual-Neural-Machine-Translation-Reading-List/" rel="prev" title="Multilingual Neural Machine Translation Reading List">
-      <i class="fa fa-chevron-left"></i> Multilingual Neural Machine Translation Reading List
+    <a href="/2021/09/03/Fairseq-Reading-Memo-1/" rel="prev" title="Fairseq-Reading-Memo(1)">
+      <i class="fa fa-chevron-left"></i> Fairseq-Reading-Memo(1)
     </a></div>
       <div class="post-nav-item"></div>
     </div>
@@ -363,7 +296,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">训练流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%88%9B%E5%BB%BA%EF%BC%88task-setup-task%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">任务创建（task.setup_task）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%9E%8B%EF%BC%88task-build-model%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">创建模型（task.build_model）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%EF%BC%88task-build-criterion%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">创建损失函数（task.build_criterion）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96%E9%AA%8C%E8%AF%81%E9%9B%86"><span class="nav-number">5.</span> <span class="nav-text">读取验证集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%AE%AD%E7%BB%83%E5%99%A8%EF%BC%88Trainer%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">创建训练器（Trainer）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96checkpoint"><span class="nav-number">7.</span> <span class="nav-text">读取checkpoint</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E8%AE%AD%E7%BB%83"><span class="nav-number">8.</span> <span class="nav-text">开始训练</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -377,7 +309,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
