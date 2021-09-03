@@ -28,7 +28,7 @@
 <meta property="og:description" content="This is the reading memo of the Fairseq framework.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-03T01:24:29.000Z">
-<meta property="article:modified_time" content="2021-09-03T07:42:02.560Z">
+<meta property="article:modified_time" content="2021-09-03T11:18:55.194Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 09:24:29 / Modified: 15:42:02" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 09:24:29 / Modified: 19:18:55" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -222,14 +222,14 @@
 <span id="more"></span>
 
 <h2 id="训练流程"><a href="#训练流程" class="headerlink" title="训练流程"></a>训练流程</h2><ol>
-<li>fairseq-master最外层的train.py文件调用主函数fairseq_cli.train中的cli_main()启动训练过程。</li>
-<li>在cli_main()函数中主要完成参数的读取、分布式训练和单GPU训练的初始化（分布式训练，单节点多GPU，单GPU）。单GPU条件下直接调用main()函数；分布式训练则首先调用distributed_main()函数完成分布式设置，而后再调用main()函数。</li>
-<li>在main()函数中的流程如下：<ul>
+<li>fairseq-master最外层的train.py文件调用主函数fairseq_cli.train中的<code>cli_main()</code>启动训练过程。</li>
+<li>在cli_main()函数中主要完成参数的读取、分布式训练和单GPU训练的初始化（分布式训练，单节点多GPU，单GPU）。单GPU条件下直接调用<code>main()</code>函数；分布式训练则首先调用<code>distributed_main()</code>函数完成分布式设置，而后再调用<code>main()</code>函数。</li>
+<li>在<code>main()</code>函数中的流程如下：<ul>
 <li>判断是否使用CUDA或分布式</li>
 <li>打印全部参数</li>
-<li>创建并初始化task: tasks.setup_task()</li>
+<li>创建并初始化task: <code>tasks.setup_task()</code></li>
 <li>加载验证集</li>
-<li>建立模型model和损失函数criterion: task.build_model(); task.build_criterion()。这两部分都是在对应的task中完成的。</li>
+<li>建立模型model和损失函数criterion: <code>task.build_model()</code>; <code>task.build_criterion()</code>。这两部分都是在对应的task中完成的。</li>
 <li>创建训练器Trainer</li>
 <li>检查是否有checkpoint文件，如果有就加载，无重新开始训练</li>
 <li>创建训练控制器</li>
@@ -244,29 +244,29 @@
 </li>
 </ol>
 <h2 id="任务创建（task-setup-task）"><a href="#任务创建（task-setup-task）" class="headerlink" title="任务创建（task.setup_task）"></a>任务创建（task.setup_task）</h2><ol>
-<li><p>调用fairseq/models文件夹下的__init__.py文件，由__init__.setup_task()函数来调用对应训练任务的setup_task()函数，并有setup_task()函数完成对task的初始化。</p>
+<li><p>调用fairseq/models文件夹下的__init__.py文件，由<code>__init__.setup_task()</code>函数来调用对应训练任务的<code>setup_task()</code>函数，并有<code>setup_task()</code>函数完成对task的初始化。</p>
 </li>
-<li><p>以TranslationMultiSimpleEpochTask为例，在__init__()函数中完成对语言langs，词表dicts，语言对lang_pairs，源语言source_langs，目标语言target_langs，数据过采样方法sampling_method，数据读取工具data_amnager的初始化，检查是否有不在词典中的语言。</p>
+<li><p>以TranslationMultiSimpleEpochTask为例，在<code>__init__()</code>函数中完成对语言langs，词表dicts，语言对lang_pairs，源语言source_langs，目标语言target_langs，数据过采样方法sampling_method，数据读取工具data_amnager的初始化，检查是否有不在词典中的语言。</p>
 </li>
 </ol>
 <h2 id="创建模型（task-build-model）"><a href="#创建模型（task-build-model）" class="headerlink" title="创建模型（task.build_model）"></a>创建模型（task.build_model）</h2><ol>
-<li><p>task调用父类LegacyFairseqTask中的build_model()函数创建模型。</p>
+<li><p>task调用父类LegacyFairseqTask中的<code>build_model()</code>函数创建模型。</p>
 </li>
-<li><p>build_model()函数通过调用fairseq/models文件夹中__init__.py中的build_model()函数创建模型。判断模型是否是定义过的，而后返回model.build_model()函数。</p>
+<li><p><code>build_model()</code>函数通过调用fairseq/models文件夹中__init__.py中的<code>build_model()</code>函数创建模型。判断模型是否是定义过的，而后返回<code>model.build_model()</code>函数。</p>
 </li>
-<li><p>以Transformer model为例，首先设置源语言和目标语言两端的词表，并根据共享参数设置初始化编码器和解码器的词嵌入（build_embedding）。而后调用build_encoder()和build_decoder()函数初始化编码器和解码器（build_embedding()、build_encoder()和build_decoder()函数都定义在父类TransformerModelBase类中）。最后调用__init__()函数初始化TransformerModel类。</p>
+<li><p>以Transformer model为例，首先设置源语言和目标语言两端的词表，并根据共享参数设置初始化编码器和解码器的词嵌入（build_embedding）。而后调用<code>build_encoder()</code>和<code>build_decoder()</code>函数初始化编码器和解码器（<code>build_embedding()</code>、<code>build_encoder()</code>和<code>build_decoder()</code>函数都定义在父类TransformerModelBase类中）。最后调用<code>__init__()</code>函数初始化TransformerModel类。</p>
 <ul>
 <li>注：新版本的transformer模型从fairseq/models文件夹中移动到了fairseq/models/transformer文件夹中，分为transformer_base.py，transformer_encoder.py，transformer_decoder.py，transformer_legacy.py和transformer_config.py文件。其中，TransformerModelBase定义在transformer_base.py，TransformerModel定义在transformer_legacy.py中。</li>
 </ul>
 </li>
 </ol>
-<h2 id="创建损失函数（task-build-criterion）"><a href="#创建损失函数（task-build-criterion）" class="headerlink" title="创建损失函数（task.build_criterion）"></a>创建损失函数（task.build_criterion）</h2><p>build_criterion()函数定义在TranslationMultiSimpleEpochTask的父类LegacyFairseqTask类中，最后调用fairseq/critrions文件夹__init__.py中的build_criterion()函数，继而调用build_criterion_()函数，由fairseq/registry.py文件中setup_registry()函数返回对应的损失函数（如：label_smoothed_cross_entropy）。</p>
-<h2 id="读取验证集"><a href="#读取验证集" class="headerlink" title="读取验证集"></a>读取验证集</h2><p>调用task.load_dataset()函数读取验证集数据。</p>
-<h2 id="创建训练器（Trainer）"><a href="#创建训练器（Trainer）" class="headerlink" title="创建训练器（Trainer）"></a>创建训练器（Trainer）</h2><p>若model_parallel_size为1，调用Trainer()函数创建训练器；否则调用MegatronTrainer()函数创建训练器。训练器参数包括task，model，criterion和quantizer（可选）。</p>
+<h2 id="创建损失函数（task-build-criterion）"><a href="#创建损失函数（task-build-criterion）" class="headerlink" title="创建损失函数（task.build_criterion）"></a>创建损失函数（task.build_criterion）</h2><p><code>build_criterion()</code>函数定义在TranslationMultiSimpleEpochTask的父类LegacyFairseqTask类中，最后调用fairseq/critrions文件夹__init__.py中的<code>build_criterion()</code>函数，继而调用<code>build_criterion_()</code>函数，由fairseq/registry.py文件中<code>setup_registry()</code>函数返回对应的损失函数（如：label_smoothed_cross_entropy）。</p>
+<h2 id="读取验证集"><a href="#读取验证集" class="headerlink" title="读取验证集"></a>读取验证集</h2><p>调用<code>task.load_dataset()</code>函数读取验证集数据。</p>
+<h2 id="创建训练器（Trainer）"><a href="#创建训练器（Trainer）" class="headerlink" title="创建训练器（Trainer）"></a>创建训练器（Trainer）</h2><p>若model_parallel_size为1，调用<code>Trainer()</code>函数创建训练器；否则调用<code>MegatronTrainer()</code>函数创建训练器。训练器参数包括task，model，criterion和quantizer（可选）。</p>
 <h2 id="读取checkpoint"><a href="#读取checkpoint" class="headerlink" title="读取checkpoint"></a>读取checkpoint</h2><ol>
-<li><p>利用fairseq/checkpoint_utils.py中的load_checkpoint()读取checkpoint，得到训练迭代轮数epoch_itr。</p>
+<li><p>利用fairseq/checkpoint_utils.py中的<code>load_checkpoint()</code>读取checkpoint，得到训练迭代轮数epoch_itr。</p>
 </li>
-<li><p>利用trainer.get_lr()函数获取当前的学习率lr。</p>
+<li><p>利用<code>trainer.get_lr()</code>函数获取当前的学习率lr。</p>
 </li>
 <li><p>创建训练控制器train_meter。</p>
 </li>
@@ -274,9 +274,9 @@
 <h2 id="开始训练"><a href="#开始训练" class="headerlink" title="开始训练"></a>开始训练</h2><ol>
 <li><p>训练过程由最大训练轮数max_epoch，最小学习率stop_min_lr控制，当轮数大于max_epoch或学习率小于stop_min_lr时，结束训练。</p>
 </li>
-<li><p>通过train()函数训练一个epoch，得到验证集损失valid_losses和训练结束判定should_stop。如果should_stop为真，break结束训练。</p>
+<li><p>通过<code>train()</code>函数训练一个epoch，得到验证集损失valid_losses和训练结束判定should_stop。如果should_stop为真，break结束训练。</p>
 </li>
-<li><p>利用epoch和valid_loss通过trainer.lr_step()函数更新学习率lr。</p>
+<li><p>利用epoch和valid_loss通过<code>trainer.lr_step()</code>函数更新学习率lr。</p>
 </li>
 <li><p>更新epoch_itr。</p>
 </li>
