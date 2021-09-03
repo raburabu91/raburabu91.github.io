@@ -28,7 +28,7 @@
 <meta property="og:description" content="This is the reading memo of the Fairseq framework.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-03T01:24:29.000Z">
-<meta property="article:modified_time" content="2021-09-03T06:49:52.364Z">
+<meta property="article:modified_time" content="2021-09-03T07:15:39.811Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 09:24:29 / Modified: 14:49:52" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 09:24:29 / Modified: 15:15:39" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -254,12 +254,15 @@
 </li>
 <li><p>build_model()函数通过调用fairseq/models文件夹中__init__.py中的build_model()函数创建模型。判断模型是否是定义过的，而后返回model.build_model()函数。</p>
 </li>
-<li><p>以Transformer model为例，首先设置源语言和目标语言两端的词表，并根据共享参数设置初始化编码器和解码器的词嵌入（build_embedding）。而后调用build_encoder()和build_decoder()函数初始化编码器和解码器（build_embedding()、build_encoder()和build_decoder()函数都定义在父类TransformerBase类中）。最后调用__init__()函数初始化TransformerModel类。</p>
+<li><p>以Transformer model为例，首先设置源语言和目标语言两端的词表，并根据共享参数设置初始化编码器和解码器的词嵌入（build_embedding）。而后调用build_encoder()和build_decoder()函数初始化编码器和解码器（build_embedding()、build_encoder()和build_decoder()函数都定义在父类TransformerModelBase类中）。最后调用__init__()函数初始化TransformerModel类。</p>
+<ul>
+<li>注：新版本的transformer模型从fairseq/models文件夹中移动到了fairseq/models/transformer文件夹中，分为transformer_base.py，transformer_encoder.py，transformer_decoder.py，transformer_legacy.py和transformer_config.py文件。其中，TransformerModelBase定义在transformer_base.py，TransformerModel定义在transformer_legacy.py中。</li>
+</ul>
 </li>
 </ol>
-<ul>
-<li>注：新版本的transformer模型从fairseq/models文件夹中移动到了fairseq/models/transformer文件夹中，分为transformer_base.py，transformer_encoder.py，transformer_decoder.py，transformer_legacy.py和transformer_config.py文件。其中，TransformerBase定义在transformer_base.py，TransformerModel定义在transformer_legacy.py中。</li>
-</ul>
+<h2 id="创建损失函数（task-build-criterion）"><a href="#创建损失函数（task-build-criterion）" class="headerlink" title="创建损失函数（task.build_criterion）"></a>创建损失函数（task.build_criterion）</h2><ol>
+<li>build_criterion()函数定义在TranslationMultiSimpleEpochTask的父类LegacyFairseqTask类中，最后调用fairseq/critrions文件夹__init__.py中的build_criterion()函数，继而调用build_criterion_()函数，由fairseq/registry.py文件中setup_registry()函数返回对应的损失函数（如：label_smoothed_cross_entropy）。</li>
+</ol>
 
     </div>
 
@@ -340,7 +343,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">训练流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%88%9B%E5%BB%BA%EF%BC%88task-setup-task%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">任务创建（task.setup_task）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%9E%8B%EF%BC%88task-build-model%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">创建模型（task.build_model）</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">训练流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%88%9B%E5%BB%BA%EF%BC%88task-setup-task%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">任务创建（task.setup_task）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%9E%8B%EF%BC%88task-build-model%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">创建模型（task.build_model）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%EF%BC%88task-build-criterion%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">创建损失函数（task.build_criterion）</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
