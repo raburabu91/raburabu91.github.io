@@ -28,7 +28,7 @@
 <meta property="og:description" content="This is the reading memo of the Fairseq framework. This chapter focuses on training.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-03T07:37:07.000Z">
-<meta property="article:modified_time" content="2021-09-03T07:41:50.870Z">
+<meta property="article:modified_time" content="2021-09-03T08:34:06.506Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 15:37:07 / Modified: 15:41:50" itemprop="dateCreated datePublished" datetime="2021-09-03T15:37:07+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 15:37:07 / Modified: 16:34:06" itemprop="dateCreated datePublished" datetime="2021-09-03T15:37:07+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -221,7 +221,15 @@
         <p>This is the reading memo of the Fairseq framework. This chapter focuses on training.</p>
 <span id="more"></span>
 
-
+<h2 id="训练器创建"><a href="#训练器创建" class="headerlink" title="训练器创建"></a>训练器创建</h2><ol>
+<li><p>利用task，model，criterion初始化训练器Trainer：trainer = Trainer(cfg, task, model, criterion, quantizer)，其中quantizer为可选参数。Trainer类定义在fairseq/trainer.py文件中。</p>
+</li>
+<li><p>在__init__()函数中初始化训练器中的task，model，criterion，设备（cuda、gpu），半精度训练，分布式训练。定义了lr_scheduler，num_updates，optimizer等参数及其对应的调用函数。</p>
+</li>
+<li><p>训练器中定义了save_checkpoint()，load_checkpoint()，get_train_iterator()，get_valid_iterator()，begin_epoch()，begin_valid_epoch()，train_step()，valid_step()等函数。</p>
+</li>
+</ol>
+<h2 id="train-函数"><a href="#train-函数" class="headerlink" title="train()函数"></a>train()函数</h2>
     </div>
 
     
@@ -301,6 +309,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E5%99%A8%E5%88%9B%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">训练器创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#train-%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">train()函数</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
