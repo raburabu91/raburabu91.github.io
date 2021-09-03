@@ -28,7 +28,7 @@
 <meta property="og:description" content="This is the reading memo of the Fairseq framework.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-03T01:24:29.000Z">
-<meta property="article:modified_time" content="2021-09-03T01:27:49.681Z">
+<meta property="article:modified_time" content="2021-09-03T01:47:48.416Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 09:24:29 / Modified: 09:27:49" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 09:24:29 / Modified: 09:47:48" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -221,6 +221,28 @@
         <p>This is the reading memo of the Fairseq framework. </p>
 <span id="more"></span>
 
+<h2 id="训练流程"><a href="#训练流程" class="headerlink" title="训练流程"></a>训练流程</h2><ol>
+<li>fairseq-master最外层的train.py文件调用主函数cli_main()启动训练过程。</li>
+<li>在cli_main()函数中主要完成参数的读取、分布式训练和单GPU训练的初始化（分布式训练，单节点多GPU，单GPU）。单GPU条件下直接调用main()函数；分布式训练则首先调用distributed_main()函数完成分布式设置，而后再调用main()函数。</li>
+<li>在main()函数中的流程如下：</li>
+</ol>
+<ul>
+<li>判断是否使用CUDA或分布式</li>
+<li>打印全部参数</li>
+<li>创建并初始化task: tasks.setup_task()</li>
+<li>加载验证集</li>
+<li>建立模型model和损失函数criterion: task.build_model(); task.build_criterion()。这两部分都是在对应的task中完成的。</li>
+<li>创建训练器Trainer</li>
+<li>检查是否有checkpoint文件，如果有就加载，无重新开始训练</li>
+<li>创建训练控制器</li>
+<li>开始训练，直到训练结束（训练过程由学习率lr，最大轮数max_epoch和最大更新步数max_update共同控制）<ul>
+<li>训练一个epoch</li>
+<li>如果验证集存在，进行一次验证并得到损失</li>
+<li>利用第一个验证集损失更新学习率lr</li>
+<li>保存模型（checkpoint）</li>
+</ul>
+</li>
+</ul>
 
     </div>
 
@@ -301,6 +323,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">训练流程</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
