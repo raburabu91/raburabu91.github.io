@@ -28,7 +28,7 @@
 <meta property="og:description" content="This is the reading memo of the Fairseq framework.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-03T01:24:29.000Z">
-<meta property="article:modified_time" content="2021-09-03T07:15:39.811Z">
+<meta property="article:modified_time" content="2021-09-03T07:34:43.857Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 09:24:29 / Modified: 15:15:39" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 09:24:29 / Modified: 15:34:43" itemprop="dateCreated datePublished" datetime="2021-09-03T09:24:29+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -260,8 +260,28 @@
 </ul>
 </li>
 </ol>
-<h2 id="创建损失函数（task-build-criterion）"><a href="#创建损失函数（task-build-criterion）" class="headerlink" title="创建损失函数（task.build_criterion）"></a>创建损失函数（task.build_criterion）</h2><ol>
-<li>build_criterion()函数定义在TranslationMultiSimpleEpochTask的父类LegacyFairseqTask类中，最后调用fairseq/critrions文件夹__init__.py中的build_criterion()函数，继而调用build_criterion_()函数，由fairseq/registry.py文件中setup_registry()函数返回对应的损失函数（如：label_smoothed_cross_entropy）。</li>
+<h2 id="创建损失函数（task-build-criterion）"><a href="#创建损失函数（task-build-criterion）" class="headerlink" title="创建损失函数（task.build_criterion）"></a>创建损失函数（task.build_criterion）</h2><p>build_criterion()函数定义在TranslationMultiSimpleEpochTask的父类LegacyFairseqTask类中，最后调用fairseq/critrions文件夹__init__.py中的build_criterion()函数，继而调用build_criterion_()函数，由fairseq/registry.py文件中setup_registry()函数返回对应的损失函数（如：label_smoothed_cross_entropy）。</p>
+<h2 id="读取验证集"><a href="#读取验证集" class="headerlink" title="读取验证集"></a>读取验证集</h2><p>调用task.load_dataset()函数读取验证集数据。</p>
+<h2 id="创建训练器（Trainer）"><a href="#创建训练器（Trainer）" class="headerlink" title="创建训练器（Trainer）"></a>创建训练器（Trainer）</h2><p>若model_parallel_size为1，调用Trainer()函数创建训练器；否则调用MegatronTrainer()函数创建训练器。训练器参数包括task，model，criterion和quantizer（可选）。</p>
+<h2 id="读取checkpoint"><a href="#读取checkpoint" class="headerlink" title="读取checkpoint"></a>读取checkpoint</h2><ol>
+<li><p>利用fairseq/checkpoint_utils.py中的load_checkpoint()读取checkpoint，得到训练迭代轮数epoch_itr。</p>
+</li>
+<li><p>利用trainer.get_lr()函数获取当前的学习率lr。</p>
+</li>
+<li><p>创建训练控制器train_meter。</p>
+</li>
+</ol>
+<h2 id="开始训练"><a href="#开始训练" class="headerlink" title="开始训练"></a>开始训练</h2><ol>
+<li><p>训练过程由最大训练轮数max_epoch，最小学习率stop_min_lr控制，当轮数大于max_epoch或学习率小于stop_min_lr时，结束训练。</p>
+</li>
+<li><p>通过train()函数训练一个epoch，得到验证集损失valid_losses和训练结束判定should_stop。如果should_stop为真，break结束训练。</p>
+</li>
+<li><p>利用epoch和valid_loss通过trainer.lr_step()函数更新学习率lr。</p>
+</li>
+<li><p>更新epoch_itr。</p>
+</li>
+<li><p>结束训练，关闭训练控制器train_meter。</p>
+</li>
 </ol>
 
     </div>
@@ -343,7 +363,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">训练流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%88%9B%E5%BB%BA%EF%BC%88task-setup-task%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">任务创建（task.setup_task）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%9E%8B%EF%BC%88task-build-model%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">创建模型（task.build_model）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%EF%BC%88task-build-criterion%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">创建损失函数（task.build_criterion）</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">训练流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%88%9B%E5%BB%BA%EF%BC%88task-setup-task%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">任务创建（task.setup_task）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%9E%8B%EF%BC%88task-build-model%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">创建模型（task.build_model）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%EF%BC%88task-build-criterion%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">创建损失函数（task.build_criterion）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96%E9%AA%8C%E8%AF%81%E9%9B%86"><span class="nav-number">5.</span> <span class="nav-text">读取验证集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%AE%AD%E7%BB%83%E5%99%A8%EF%BC%88Trainer%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">创建训练器（Trainer）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96checkpoint"><span class="nav-number">7.</span> <span class="nav-text">读取checkpoint</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E8%AE%AD%E7%BB%83"><span class="nav-number">8.</span> <span class="nav-text">开始训练</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
