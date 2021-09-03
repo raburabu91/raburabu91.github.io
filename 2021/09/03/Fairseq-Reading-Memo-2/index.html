@@ -28,7 +28,7 @@
 <meta property="og:description" content="This is the reading memo of the Fairseq framework. This chapter focuses on training.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-03T07:37:07.000Z">
-<meta property="article:modified_time" content="2021-09-03T09:10:35.885Z">
+<meta property="article:modified_time" content="2021-09-03T10:14:27.284Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 15:37:07 / Modified: 17:10:35" itemprop="dateCreated datePublished" datetime="2021-09-03T15:37:07+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 15:37:07 / Modified: 18:14:27" itemprop="dateCreated datePublished" datetime="2021-09-03T15:37:07+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -235,6 +235,8 @@
 <li><p>调用trainer.begin_epoch()函数，跳转到trainer.py中，而后调用特定任务中的begin_epoch()函数: task.begin_epoch()。</p>
 </li>
 <li><p>调用trainer.train_step()函数，跳转到trainer.py中。每个sample执行一个task.train_step()完成一次forward和backward传播。train_step()函数定义在task的父类FairseqTask类中。</p>
+</li>
+<li><p>在train_step()函数中，首先执行model.train()和model.set_num_updates()。而后执行训练的主函数。模型的训练过程是在计算损失的过程中实现的：criterion(model, sample)。在label_smooth_cross_entropy.py的forward()函数中，首先调用<code>net_output = model(**sample[&quot;net_input&quot;])</code></p>
 </li>
 </ol>
 
