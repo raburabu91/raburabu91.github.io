@@ -28,7 +28,7 @@
 <meta property="og:description" content="This is the reading memo of the Fairseq framework. This chapter focuses on training.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-03T07:37:07.000Z">
-<meta property="article:modified_time" content="2021-09-03T10:22:16.329Z">
+<meta property="article:modified_time" content="2021-09-03T10:29:50.860Z">
 <meta property="article:author" content="Raburabu91">
 <meta property="article:tag" content="Fairseq">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-09-03 15:37:07 / Modified: 18:22:16" itemprop="dateCreated datePublished" datetime="2021-09-03T15:37:07+08:00">2021-09-03</time>
+              <time title="Created: 2021-09-03 15:37:07 / Modified: 18:29:50" itemprop="dateCreated datePublished" datetime="2021-09-03T15:37:07+08:00">2021-09-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -236,7 +236,9 @@
 </li>
 <li><p>调用<code>trainer.train_step()</code>函数，跳转到trainer.py中。每个sample执行一个<code>task.train_step()</code>完成一次forward和backward传播。<code>train_step()</code>函数定义在task的父类FairseqTask类中。</p>
 </li>
-<li><p>在<code>train_step()</code>函数中，首先执行model.train()和<code>model.set_num_updates()</code>。而后执行训练的主函数。模型的训练过程是在计算损失的过程中实现的：<code>criterion(model, sample)</code>。在label_smooth_cross_entropy.py的<code>forward()</code>函数中，首先调用<code>net_output = model(**sample[&quot;net_input&quot;])</code></p>
+<li><p>在<code>train_step()</code>函数中，首先执行model.train()和<code>model.set_num_updates()</code>。而后执行训练的主函数。模型的训练过程是在计算损失的过程中实现的：<code>criterion(model, sample)</code>。在label_smooth_cross_entropy.py的<code>forward()</code>函数中，首先调用<code>net_output = model(**sample[&quot;net_input&quot;])</code>语句执行<code>model.forward()</code>函数，这句话就是模型训练的接口函数。<code>sample[&quot;net_input&quot;]</code>是一个字典结构，包括’src_tokens’, ‘src_lengths’, ‘prev_output_tokens’，与<code>Transformer.forward()</code>函数中的参数一致。</p>
+</li>
+<li><p>在第4步得到net_output之后，调用<code>compute_loss()</code>函数计算训练损失，并将结果返回给trainer中。</p>
 </li>
 </ol>
 
